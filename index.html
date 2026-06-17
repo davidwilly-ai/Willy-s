@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Willy's — Premium Sport Nutrition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --neon-red:    #ff1a3c;
+      --neon-red-dim: rgba(255,26,60,0.18);
+      --neon-cyan:   #00d4ff;
+      --neon-green:  #39ff6e;
+      --bg:          #000000;
+      --bg-1:        #0a0a0a;
+      --bg-2:        #111111;
+      --bg-3:        #181818;
+      --border:      rgba(255,255,255,0.06);
+      --text:        #f0f0f0;
+      --muted:       #666666;
+      --font-head:   'Bebas Neue', sans-serif;
+      --font-mono:   'Share Tech Mono', monospace;
+      --font-body:   'Inter', sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── GRID OVERLAY ──────────────────────────────────────────────────── */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,26,60,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,26,60,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* ─── NEON GLOWS ────────────────────────────────────────────────────── */
+    .glow-red   { box-shadow: 0 0 12px rgba(255,26,60,.5), 0 0 40px rgba(255,26,60,.2), 0 0 80px rgba(255,26,60,.08); }
+    .glow-cyan  { box-shadow: 0 0 12px rgba(0,212,255,.5), 0 0 40px rgba(0,212,255,.2), 0 0 80px rgba(0,212,255,.08); }
+    .glow-green { box-shadow: 0 0 12px rgba(57,255,110,.5), 0 0 40px rgba(57,255,110,.2), 0 0 80px rgba(57,255,110,.08); }
+
+    .text-neon-red   { color: var(--neon-red);   text-shadow: 0 0 10px rgba(255,26,60,.7), 0 0 30px rgba(255,26,60,.4); }
+    .text-neon-cyan  { color: var(--neon-cyan);  text-shadow: 0 0 10px rgba(0,212,255,.7), 0 0 30px rgba(0,212,255,.4); }
+    .text-neon-green { color: var(--neon-green); text-shadow: 0 0 10px rgba(57,255,110,.7), 0 0 30px rgba(57,255,110,.4); }
+
+    /* ─── ANIMATIONS ────────────────────────────────────────────────────── */
+    @keyframes float {
+      0%,100% { transform: translateY(0)   rotateZ(0deg); }
+      33%     { transform: translateY(-14px) rotateZ(1deg); }
+      66%     { transform: translateY(-7px)  rotateZ(-0.5deg); }
+    }
+    @keyframes neonPulse {
+      0%,100% { filter: drop-shadow(0 0 10px rgba(255,26,60,.7)) drop-shadow(0 0 30px rgba(255,26,60,.4)); }
+      50%     { filter: drop-shadow(0 0 22px rgba(255,26,60,1))  drop-shadow(0 0 60px rgba(255,26,60,.6)) drop-shadow(0 0 100px rgba(255,26,60,.25)); }
+    }
+    @keyframes scanline {
+      0%   { background-position: 0 0; }
+      100% { background-position: 0 100vh; }
+    }
+    @keyframes borderGlow {
+      0%,100% { border-color: rgba(255,26,60,.3); }
+      50%     { border-color: rgba(255,26,60,.8); }
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes countUp { from { opacity:0; } to { opacity:1; } }
+    @keyframes rgbShift {
+      0%,100% { text-shadow: 2px 0 rgba(255,26,60,.6), -2px 0 rgba(0,212,255,.4); }
+      50%     { text-shadow: -2px 0 rgba(255,26,60,.6), 2px 0 rgba(0,212,255,.4); }
+    }
+
+    .hero-logo {
+      animation: float 7s ease-in-out infinite, neonPulse 3s ease-in-out infinite;
+    }
+    .fade-up { animation: fadeUp .7s cubic-bezier(.22,1,.36,1) both; }
+    .fade-up-1 { animation-delay:.1s; }
+    .fade-up-2 { animation-delay:.25s; }
+    .fade-up-3 { animation-delay:.4s; }
+    .fade-up-4 { animation-delay:.55s; }
+
+    /* ─── SCANLINES ─────────────────────────────────────────────────────── */
+    .scanlines::after {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none; z-index: 1;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.12) 2px, rgba(0,0,0,.12) 4px);
+    }
+
+    /* ─── NAV ───────────────────────────────────────────────────────────── */
+    .nav-link {
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-link:hover { color: var(--text); }
+    .nav-link:focus-visible { outline: 1px solid var(--neon-red); outline-offset: 4px; border-radius: 2px; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--neon-red);
+      color: #fff;
+      font-weight: 700;
+      font-size: .8rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      position: relative;
+      transition: transform .15s cubic-bezier(.34,1.56,.64,1), box-shadow .15s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 0 20px rgba(255,26,60,.6), 0 0 60px rgba(255,26,60,.2);
+    }
+    .btn-primary:active { transform: scale(.97); }
+    .btn-primary:focus-visible { outline: 2px solid var(--neon-red); outline-offset: 3px; }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--text);
+      font-weight: 500;
+      font-size: .8rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.12);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: border-color .2s, color .2s, transform .15s cubic-bezier(.34,1.56,.64,1);
+    }
+    .btn-ghost:hover { border-color: rgba(255,26,60,.5); color: var(--neon-red); transform: translateY(-1px); }
+    .btn-ghost:active { transform: scale(.97); }
+    .btn-ghost:focus-visible { outline: 2px solid var(--neon-red); outline-offset: 3px; }
+
+    /* ─── CARDS ─────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: border-color .25s ease, box-shadow .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1);
+    }
+    .card:hover {
+      border-color: rgba(255,26,60,.35);
+      box-shadow: 0 0 30px rgba(255,26,60,.1), 0 20px 60px rgba(0,0,0,.6);
+      transform: translateY(-4px);
+    }
+
+    .card-cyan:hover {
+      border-color: rgba(0,212,255,.35);
+      box-shadow: 0 0 30px rgba(0,212,255,.1), 0 20px 60px rgba(0,0,0,.6);
+    }
+    .card-green:hover {
+      border-color: rgba(57,255,110,.35);
+      box-shadow: 0 0 30px rgba(57,255,110,.1), 0 20px 60px rgba(0,0,0,.6);
+    }
+
+    /* ─── NEON LINE ─────────────────────────────────────────────────────── */
+    .neon-line {
+      height: 2px;
+      background: var(--neon-red);
+      box-shadow: 0 0 6px var(--neon-red), 0 0 20px rgba(255,26,60,.5);
+    }
+    .neon-line-cyan  { background: var(--neon-cyan);  box-shadow: 0 0 6px var(--neon-cyan),  0 0 20px rgba(0,212,255,.5); }
+    .neon-line-green { background: var(--neon-green); box-shadow: 0 0 6px var(--neon-green), 0 0 20px rgba(57,255,110,.5); }
+
+    /* ─── NEON BORDER CARD ──────────────────────────────────────────────── */
+    .neon-border-red {
+      border: 1px solid rgba(255,26,60,.4);
+      animation: borderGlow 3s ease-in-out infinite;
+    }
+
+    /* ─── PRODUCT BADGE ─────────────────────────────────────────────────── */
+    .badge {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      border-radius: 3px;
+      padding: 3px 8px;
+    }
+
+    /* ─── PILL TAGS ─────────────────────────────────────────────────────── */
+    .tag {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      padding: 3px 8px;
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+
+    /* ─── SCROLLBAR ─────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #1f1f1f; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--neon-red); }
+
+    /* ─── RESPONSIVE GRID OVERRIDES ─────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero-grid  { grid-template-columns: 1fr !important; text-align: center; }
+      .hero-logo  { width: 200px !important; }
+      .hero-logo-wrap { justify-content: center; }
+      .hero-btns  { justify-content: center; }
+      .stats-grid { grid-template-columns: 1fr 1fr !important; }
+      .products-grid { grid-template-columns: 1fr !important; }
+      .partners-grid { grid-template-columns: 1fr !important; }
+      .features-grid { grid-template-columns: 1fr !important; }
+      .footer-grid   { grid-template-columns: 1fr 1fr !important; }
+      .footer-brand  { grid-column: 1 / -1 !important; }
+      .desktop-nav   { display: none !important; }
+      .hamburger     { display: flex !important; }
+    }
+    @media (min-width: 769px) {
+      .hamburger   { display: none !important; }
+      .mobile-menu { display: none !important; }
+    }
+  </style>
+</head>
+<body class="grid-bg">
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════════════════════════════════════ -->
+<nav style="position:sticky;top:0;z-index:100;background:rgba(0,0,0,.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.05);">
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;">
+    <!-- Logo -->
+    <a href="#" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
+      <img src="brand_assets/Willy's_Logo.png" alt="Willy's" style="height:38px;width:auto;filter:drop-shadow(0 0 8px rgba(255,26,60,.5));">
+    </a>
+
+    <!-- Desktop links -->
+    <div class="desktop-nav" style="display:flex;align-items:center;gap:32px;">
+      <a href="#products"  class="nav-link">Produkte</a>
+      <a href="#partners"  class="nav-link">Partner</a>
+      <a href="#community" class="nav-link">Community</a>
+      <a href="#about"     class="nav-link">Über uns</a>
+    </div>
+
+    <!-- Desktop CTA -->
+    <a href="#shop" class="btn-primary desktop-nav" style="padding:10px 22px;">
+      Shop Now
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+
+    <!-- Hamburger -->
+    <button class="hamburger" id="hamburger" aria-label="Menü öffnen" style="background:none;border:none;cursor:pointer;padding:8px;flex-direction:column;gap:5px;">
+      <span style="display:block;width:22px;height:2px;background:#fff;border-radius:1px;"></span>
+      <span style="display:block;width:22px;height:2px;background:#fff;border-radius:1px;"></span>
+      <span style="display:block;width:22px;height:2px;background:#fff;border-radius:1px;"></span>
+    </button>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobile-menu" style="background:var(--bg-1);border-top:1px solid rgba(255,255,255,.05);">
+    <a href="#products"  class="nav-link" style="display:block;padding:14px 24px;">Produkte</a>
+    <a href="#partners"  class="nav-link" style="display:block;padding:14px 24px;">Partner</a>
+    <a href="#community" class="nav-link" style="display:block;padding:14px 24px;">Community</a>
+    <a href="#about"     class="nav-link" style="display:block;padding:14px 24px;">Über uns</a>
+    <div style="padding:14px 24px;">
+      <a href="#shop" class="btn-primary" style="padding:12px 22px;width:100%;justify-content:center;">Shop Now</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════════════════════ -->
+<section class="scanlines" style="position:relative;min-height:calc(100vh - 60px);display:flex;align-items:center;overflow:hidden;">
+
+  <!-- Ambient blobs -->
+  <div style="position:absolute;top:-120px;right:-80px;width:500px;height:500px;background:radial-gradient(circle, rgba(255,26,60,.1) 0%, transparent 70%);pointer-events:none;"></div>
+  <div style="position:absolute;bottom:-80px;left:-100px;width:400px;height:400px;background:radial-gradient(circle, rgba(255,26,60,.06) 0%, transparent 70%);pointer-events:none;"></div>
+
+  <!-- Center glow -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 55% 50%, rgba(255,26,60,.05) 0%, transparent 60%);pointer-events:none;z-index:0;"></div>
+
+  <div class="hero-grid" style="max-width:1200px;margin:0 auto;padding:80px 24px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative;z-index:2;width:100%;">
+
+    <!-- Left: Copy -->
+    <div>
+      <!-- Eyebrow -->
+      <div class="fade-up fade-up-1" style="display:inline-flex;align-items:center;gap:8px;margin-bottom:28px;border:1px solid rgba(255,26,60,.25);border-radius:3px;padding:5px 14px;background:rgba(255,26,60,.07);">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--neon-red);box-shadow:0 0 6px var(--neon-red);animation:neonPulse 2s ease-in-out infinite;display:inline-block;"></span>
+        <span style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.12em;color:var(--neon-red);">PREMIUM SPORT NUTRITION</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="fade-up fade-up-2" style="font-family:var(--font-head);font-size:clamp(64px,8.5vw,108px);line-height:.9;letter-spacing:-.01em;margin-bottom:28px;">
+        FUEL YOUR<br>
+        <span class="text-neon-red">POTENTIAL.</span>
+      </h1>
+
+      <!-- Sub -->
+      <p class="fade-up fade-up-3" style="font-size:1.05rem;line-height:1.75;color:#888;max-width:440px;margin-bottom:40px;">
+        Willy's liefert dir die besten Protein-Formeln für maximale Performance — in Partnerschaft mit <strong style="color:var(--text);">ESN</strong> und <strong style="color:var(--text);">More Nutrition</strong>.
+      </p>
+
+      <!-- CTAs -->
+      <div class="fade-up fade-up-4 hero-btns" style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px;">
+        <a href="#products" class="btn-primary" style="padding:14px 30px;font-size:.85rem;">
+          Jetzt bestellen
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#partners" class="btn-ghost" style="padding:14px 30px;font-size:.85rem;">Unsere Partner</a>
+      </div>
+
+      <!-- Trust row -->
+      <div class="fade-up" style="animation-delay:.65s;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#39ff6e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font-size:.75rem;color:#555;letter-spacing:.06em;">Lab Tested</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#39ff6e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font-size:.75rem;color:#555;letter-spacing:.06em;">Express Versand</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#39ff6e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font-size:.75rem;color:#555;letter-spacing:.06em;">Made in Germany</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Logo 3D -->
+    <div class="hero-logo-wrap" style="display:flex;justify-content:flex-end;align-items:center;position:relative;">
+      <!-- Rings -->
+      <div style="position:absolute;width:360px;height:360px;border:1px solid rgba(255,26,60,.1);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);"></div>
+      <div style="position:absolute;width:300px;height:300px;border:1px dashed rgba(255,26,60,.06);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%) rotate(30deg);"></div>
+      <div style="position:absolute;width:240px;height:240px;border:1px solid rgba(255,26,60,.08);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);"></div>
+
+      <!-- Corner brackets -->
+      <div style="position:absolute;top:10%;left:10%;width:20px;height:20px;border-top:1.5px solid rgba(255,26,60,.5);border-left:1.5px solid rgba(255,26,60,.5);"></div>
+      <div style="position:absolute;top:10%;right:10%;width:20px;height:20px;border-top:1.5px solid rgba(255,26,60,.5);border-right:1.5px solid rgba(255,26,60,.5);"></div>
+      <div style="position:absolute;bottom:10%;left:10%;width:20px;height:20px;border-bottom:1.5px solid rgba(255,26,60,.5);border-left:1.5px solid rgba(255,26,60,.5);"></div>
+      <div style="position:absolute;bottom:10%;right:10%;width:20px;height:20px;border-bottom:1.5px solid rgba(255,26,60,.5);border-right:1.5px solid rgba(255,26,60,.5);"></div>
+
+      <!-- HUD dots -->
+      <div style="position:absolute;top:18%;left:50%;width:5px;height:5px;background:var(--neon-red);border-radius:50%;box-shadow:0 0 8px var(--neon-red);animation:neonPulse 2.5s ease-in-out infinite;"></div>
+      <div style="position:absolute;bottom:22%;right:18%;width:4px;height:4px;background:var(--neon-cyan);border-radius:50%;box-shadow:0 0 8px var(--neon-cyan);animation:neonPulse 3.5s ease-in-out infinite .5s;"></div>
+
+      <!-- HUD label -->
+      <div style="position:absolute;top:12%;right:8%;font-family:var(--font-mono);font-size:.58rem;color:rgba(255,26,60,.5);letter-spacing:.1em;">SYS:ACTIVE</div>
+      <div style="position:absolute;bottom:14%;left:8%;font-family:var(--font-mono);font-size:.58rem;color:rgba(0,212,255,.4);letter-spacing:.1em;">PRO:MAX</div>
+
+      <img src="brand_assets/Willy's_Logo.png" alt="Willy's 3D Heart" class="hero-logo" style="width:290px;height:auto;position:relative;z-index:2;">
+    </div>
+  </div>
+
+  <!-- Bottom fade -->
+  <div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to bottom,transparent,#000);pointer-events:none;z-index:3;"></div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     STATS STRIP
+════════════════════════════════════════════════════════════════════════ -->
+<div style="border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);background:var(--bg-1);">
+  <div class="stats-grid" style="max-width:1200px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:repeat(4,1fr);">
+    <div style="padding:28px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.04);">
+      <div style="font-family:var(--font-head);font-size:46px;color:var(--neon-red);line-height:1;text-shadow:0 0 15px rgba(255,26,60,.5);">12K+</div>
+      <div style="font-family:var(--font-mono);font-size:.65rem;color:var(--muted);letter-spacing:.12em;margin-top:4px;">KUNDEN</div>
+    </div>
+    <div style="padding:28px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.04);">
+      <div style="font-family:var(--font-head);font-size:46px;color:var(--neon-red);line-height:1;text-shadow:0 0 15px rgba(255,26,60,.5);">500K+</div>
+      <div style="font-family:var(--font-mono);font-size:.65rem;color:var(--muted);letter-spacing:.12em;margin-top:4px;">SHAKES SOLD</div>
+    </div>
+    <div style="padding:28px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.04);">
+      <div style="font-family:var(--font-head);font-size:46px;color:var(--neon-red);line-height:1;text-shadow:0 0 15px rgba(255,26,60,.5);">30+</div>
+      <div style="font-family:var(--font-mono);font-size:.65rem;color:var(--muted);letter-spacing:.12em;margin-top:4px;">SORTEN</div>
+    </div>
+    <div style="padding:28px 20px;text-align:center;">
+      <div style="font-family:var(--font-head);font-size:46px;color:var(--neon-red);line-height:1;text-shadow:0 0 15px rgba(255,26,60,.5);">2</div>
+      <div style="font-family:var(--font-mono);font-size:.65rem;color:var(--muted);letter-spacing:.12em;margin-top:4px;">TOP PARTNER</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PARTNER SECTION
+════════════════════════════════════════════════════════════════════════ -->
+<section id="partners" style="padding:110px 24px;position:relative;overflow:hidden;">
+  <!-- Ambient -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:400px;background:radial-gradient(ellipse, rgba(255,26,60,.04), transparent 70%);pointer-events:none;"></div>
+
+  <div style="max-width:1200px;margin:0 auto;position:relative;z-index:1;">
+    <!-- Section header -->
+    <div style="text-align:center;margin-bottom:72px;">
+      <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.2em;color:var(--neon-red);margin-bottom:14px;">// OFFIZIELLE PARTNER</div>
+      <h2 style="font-family:var(--font-head);font-size:clamp(40px,5vw,64px);letter-spacing:.02em;margin-bottom:20px;">POWERED BY THE BEST</h2>
+      <div class="neon-line" style="width:48px;margin:0 auto;"></div>
+    </div>
+
+    <!-- Partner cards -->
+    <div class="partners-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:900px;margin:0 auto;">
+
+      <!-- ESN -->
+      <div class="card card-cyan" style="padding:0;overflow:hidden;border-radius:16px;cursor:pointer;">
+        <!-- Neon top line -->
+        <div class="neon-line-cyan" style="height:2px;width:100%;"></div>
+        <div style="padding:48px 40px;">
+          <!-- ESN logo placeholder with neon treatment -->
+          <div style="margin-bottom:32px;">
+            <div style="display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(0,212,255,.03));border:1px solid rgba(0,212,255,.2);border-radius:12px;padding:18px 28px;box-shadow:0 0 30px rgba(0,212,255,.08),inset 0 0 20px rgba(0,212,255,.04);">
+              <span style="font-family:var(--font-head);font-size:44px;letter-spacing:.06em;color:var(--neon-cyan);text-shadow:0 0 10px rgba(0,212,255,.7),0 0 30px rgba(0,212,255,.4),0 0 60px rgba(0,212,255,.15);">ESN</span>
+            </div>
+          </div>
+
+          <div class="neon-line-cyan" style="width:32px;margin-bottom:20px;height:1.5px;"></div>
+          <h3 style="font-family:var(--font-head);font-size:32px;letter-spacing:.04em;margin-bottom:12px;">Elite Sports Nutrition</h3>
+          <p style="color:#555;font-size:.9rem;line-height:1.7;margin-bottom:28px;">Deutschlands #1 Protein-Brand für professionelle Athleten — wissenschaftlich entwickelt, kompromisslos in Qualität.</p>
+
+          <div style="display:flex;gap:24px;margin-bottom:32px;">
+            <div>
+              <div style="font-family:var(--font-head);font-size:32px;color:var(--neon-cyan);text-shadow:0 0 10px rgba(0,212,255,.5);">15+</div>
+              <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);letter-spacing:.1em;">JAHRE</div>
+            </div>
+            <div style="width:1px;background:rgba(255,255,255,.06);"></div>
+            <div>
+              <div style="font-family:var(--font-head);font-size:32px;color:var(--neon-cyan);text-shadow:0 0 10px rgba(0,212,255,.5);">200+</div>
+              <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);letter-spacing:.1em;">PRODUKTE</div>
+            </div>
+            <div style="width:1px;background:rgba(255,255,255,.06);"></div>
+            <div>
+              <div style="font-family:var(--font-head);font-size:32px;color:var(--neon-cyan);text-shadow:0 0 10px rgba(0,212,255,.5);">DE</div>
+              <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);letter-spacing:.1em;">HERKUNFT</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="tag">Whey Protein</span>
+            <span class="tag">Casein</span>
+            <span class="tag">Kreatin</span>
+            <span class="tag">Vegane Optionen</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- More Nutrition -->
+      <div class="card card-green" style="padding:0;overflow:hidden;border-radius:16px;cursor:pointer;">
+        <div class="neon-line-green" style="height:2px;width:100%;"></div>
+        <div style="padding:48px 40px;">
+          <div style="margin-bottom:32px;">
+            <div style="display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(57,255,110,.08),rgba(57,255,110,.03));border:1px solid rgba(57,255,110,.2);border-radius:12px;padding:14px 24px;box-shadow:0 0 30px rgba(57,255,110,.08),inset 0 0 20px rgba(57,255,110,.04);">
+              <span style="font-family:var(--font-head);font-size:28px;letter-spacing:.04em;color:var(--neon-green);text-shadow:0 0 10px rgba(57,255,110,.7),0 0 30px rgba(57,255,110,.4),0 0 60px rgba(57,255,110,.15);">MORE NUTRITION</span>
+            </div>
+          </div>
+
+          <div class="neon-line-green" style="width:32px;margin-bottom:20px;height:1.5px;"></div>
+          <h3 style="font-family:var(--font-head);font-size:32px;letter-spacing:.04em;margin-bottom:12px;">More Nutrition Whey</h3>
+          <p style="color:#555;font-size:.9rem;line-height:1.7;margin-bottom:28px;">Transparente Premium-Formeln ohne Kompromisse — geliebt von Tausenden Athleten für ihre Reinheit und Wirksamkeit.</p>
+
+          <div style="display:flex;gap:24px;margin-bottom:32px;">
+            <div>
+              <div style="font-family:var(--font-head);font-size:32px;color:var(--neon-green);text-shadow:0 0 10px rgba(57,255,110,.5);">100%</div>
+              <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);letter-spacing:.1em;">TRANSPARENT</div>
+            </div>
+            <div style="width:1px;background:rgba(255,255,255,.06);"></div>
+            <div>
+              <div style="font-family:var(--font-head);font-size:32px;color:var(--neon-green);text-shadow:0 0 10px rgba(57,255,110,.5);">LAB</div>
+              <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);letter-spacing:.1em;">TESTED</div>
+            </div>
+            <div style="width:1px;background:rgba(255,255,255,.06);"></div>
+            <div>
+              <div style="font-family:var(--font-head);font-size:32px;color:var(--neon-green);text-shadow:0 0 10px rgba(57,255,110,.5);">0G</div>
+              <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);letter-spacing:.1em;">ZUCKER</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="tag">Whey Isolat</span>
+            <span class="tag">Clean Label</span>
+            <span class="tag">Zuckerfrei</span>
+            <span class="tag">High Protein</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Co-branding note -->
+    <p style="text-align:center;font-family:var(--font-mono);font-size:.65rem;letter-spacing:.12em;color:rgba(255,255,255,.15);margin-top:40px;">OFFIZIELLE KOOPERATION · WILLY'S × ESN × MORE NUTRITION</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PRODUCTS
+════════════════════════════════════════════════════════════════════════ -->
+<section id="products" style="padding:110px 24px;background:var(--bg-1);border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(255,26,60,.05),transparent 70%);pointer-events:none;"></div>
+
+  <div style="max-width:1200px;margin:0 auto;position:relative;z-index:1;">
+    <div style="text-align:center;margin-bottom:72px;">
+      <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.2em;color:var(--neon-red);margin-bottom:14px;">// ITEM SHOP</div>
+      <h2 style="font-family:var(--font-head);font-size:clamp(40px,5vw,64px);letter-spacing:.02em;margin-bottom:20px;">CHOOSE YOUR WEAPON</h2>
+      <div class="neon-line" style="width:48px;margin:0 auto;"></div>
+    </div>
+
+    <div class="products-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+
+      <!-- Card 1 — Whey Isolate -->
+      <div class="card" style="overflow:hidden;position:relative;">
+        <span class="badge" style="position:absolute;top:14px;left:14px;z-index:2;background:var(--neon-red);color:#fff;">BESTSELLER</span>
+        <!-- Product visual -->
+        <div style="height:200px;background:linear-gradient(135deg,#0f0000,#1a0004);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,26,60,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,26,60,.035) 1px,transparent 1px);background-size:18px 18px;"></div>
+          <span style="font-family:var(--font-head);font-size:72px;color:rgba(255,26,60,.1);letter-spacing:-.02em;user-select:none;position:relative;z-index:1;text-shadow:0 0 40px rgba(255,26,60,.2);">WPI</span>
+          <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(to top,var(--bg-2),transparent);"></div>
+        </div>
+        <div style="padding:24px;">
+          <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.1em;color:var(--neon-red);margin-bottom:6px;">ESN × WILLY'S</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+            <h3 style="font-family:var(--font-head);font-size:22px;letter-spacing:.04em;line-height:1.1;">Whey Protein<br>Isolate</h3>
+            <div style="text-align:right;">
+              <div style="font-family:var(--font-head);font-size:24px;color:var(--neon-red);text-shadow:0 0 10px rgba(255,26,60,.4);">€39.99</div>
+              <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);">1000g</div>
+            </div>
+          </div>
+          <p style="color:#555;font-size:.82rem;line-height:1.65;margin-bottom:16px;">27g Protein pro Serving. Ultra-schnelle Absorption für maximale Muskelregeneration.</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;">
+            <span class="tag" style="color:rgba(255,26,60,.7);border-color:rgba(255,26,60,.15);background:rgba(255,26,60,.06);">27g Protein</span>
+            <span class="tag">Low Carb</span>
+            <span class="tag">Gluten Free</span>
+          </div>
+          <button class="btn-primary" style="width:100%;padding:12px;justify-content:center;border-radius:6px;">Add to Cart</button>
+        </div>
+      </div>
+
+      <!-- Card 2 — Mass Gainer (featured) -->
+      <div class="card" style="overflow:hidden;position:relative;border-color:rgba(57,255,110,.2);box-shadow:0 0 40px rgba(57,255,110,.06),0 0 1px rgba(57,255,110,.3);transform:scale(1.02);">
+        <span class="badge" style="position:absolute;top:14px;left:14px;z-index:2;background:#39ff6e;color:#000;">FEATURED</span>
+        <div style="height:200px;background:linear-gradient(135deg,#000f00,#001500);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(57,255,110,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(57,255,110,.03) 1px,transparent 1px);background-size:18px 18px;"></div>
+          <span style="font-family:var(--font-head);font-size:72px;color:rgba(57,255,110,.1);letter-spacing:-.02em;user-select:none;position:relative;z-index:1;text-shadow:0 0 40px rgba(57,255,110,.2);">MRE</span>
+          <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(to top,var(--bg-2),transparent);"></div>
+        </div>
+        <div style="padding:24px;">
+          <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.1em;color:var(--neon-green);margin-bottom:6px;">MORE NUTRITION × WILLY'S</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+            <h3 style="font-family:var(--font-head);font-size:22px;letter-spacing:.04em;line-height:1.1;">Mass Gainer<br>Pro</h3>
+            <div style="text-align:right;">
+              <div style="font-family:var(--font-head);font-size:24px;color:var(--neon-green);text-shadow:0 0 10px rgba(57,255,110,.4);">€54.99</div>
+              <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);">5000g</div>
+            </div>
+          </div>
+          <p style="color:#555;font-size:.82rem;line-height:1.65;margin-bottom:16px;">Der ultimative Mass Builder. 1200+ kcal pro Serving für ernsthafte Masse und Kraft.</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;">
+            <span class="tag" style="color:rgba(57,255,110,.7);border-color:rgba(57,255,110,.15);background:rgba(57,255,110,.06);">50g Protein</span>
+            <span class="tag">High Carb</span>
+            <span class="tag">Kreatin</span>
+          </div>
+          <button style="width:100%;padding:12px;background:var(--neon-green);color:#000;font-weight:700;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;border:none;border-radius:6px;cursor:pointer;transition:transform .15s cubic-bezier(.34,1.56,.64,1),box-shadow .15s ease;" onmouseover="this.style.transform='translateY(-2px) scale(1.02)';this.style.boxShadow='0 0 20px rgba(57,255,110,.5)'" onmouseout="this.style.transform='';this.style.boxShadow=''" onmousedown="this.style.transform='scale(.97)'">Add to Cart</button>
+        </div>
+      </div>
+
+      <!-- Card 3 — Pre-Workout -->
+      <div class="card" style="overflow:hidden;position:relative;border-color:rgba(0,212,255,.15);">
+        <span class="badge" style="position:absolute;top:14px;left:14px;z-index:2;background:rgba(147,51,234,.9);color:#fff;">NEW DROP</span>
+        <div style="height:200px;background:linear-gradient(135deg,#00000f,#080018);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03) 1px,transparent 1px);background-size:18px 18px;"></div>
+          <span style="font-family:var(--font-head);font-size:72px;color:rgba(0,212,255,.1);letter-spacing:-.02em;user-select:none;position:relative;z-index:1;text-shadow:0 0 40px rgba(0,212,255,.2);">PWR</span>
+          <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(to top,var(--bg-2),transparent);"></div>
+        </div>
+        <div style="padding:24px;">
+          <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.1em;color:var(--neon-cyan);margin-bottom:6px;">ESN × WILLY'S</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+            <h3 style="font-family:var(--font-head);font-size:22px;letter-spacing:.04em;line-height:1.1;">Pre-Workout<br>Stack</h3>
+            <div style="text-align:right;">
+              <div style="font-family:var(--font-head);font-size:24px;color:var(--neon-cyan);text-shadow:0 0 10px rgba(0,212,255,.4);">€29.99</div>
+              <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);">300g</div>
+            </div>
+          </div>
+          <p style="color:#555;font-size:.82rem;line-height:1.65;margin-bottom:16px;">Explosive Energie, Laser-Fokus, unvergleichlicher Pump. Ein Scoop, unbegrenzte Gains.</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;">
+            <span class="tag" style="color:rgba(0,212,255,.7);border-color:rgba(0,212,255,.15);background:rgba(0,212,255,.06);">200mg Koffein</span>
+            <span class="tag">Beta-Alanin</span>
+          </div>
+          <button class="btn-primary" style="width:100%;padding:12px;justify-content:center;border-radius:6px;">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:44px;">
+      <a href="#shop" class="btn-ghost" style="padding:13px 32px;">
+        Gesamtes Sortiment anzeigen
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     FEATURES / WHY WILLY'S
+════════════════════════════════════════════════════════════════════════ -->
+<section id="about" style="padding:110px 24px;position:relative;overflow:hidden;">
+  <div style="position:absolute;bottom:-100px;left:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(255,26,60,.04),transparent 70%);pointer-events:none;"></div>
+
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:72px;">
+      <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.2em;color:var(--neon-red);margin-bottom:14px;">// WHY WILLY'S</div>
+      <h2 style="font-family:var(--font-head);font-size:clamp(40px,5vw,64px);letter-spacing:.02em;margin-bottom:20px;">MEHR ALS NUR PROTEIN</h2>
+      <div class="neon-line" style="width:48px;margin:0 auto;"></div>
+    </div>
+
+    <div class="features-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      <!-- Feature 1 -->
+      <div style="background:var(--bg-2);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:32px;position:relative;overflow:hidden;transition:border-color .2s,transform .25s cubic-bezier(.34,1.56,.64,1);" onmouseover="this.style.borderColor='rgba(255,26,60,.25)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,.06)';this.style.transform=''">
+        <div style="width:44px;height:44px;background:rgba(255,26,60,.08);border:1px solid rgba(255,26,60,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:20px;">🧬</div>
+        <div class="neon-line" style="width:28px;margin-bottom:16px;height:1.5px;"></div>
+        <h3 style="font-family:var(--font-head);font-size:22px;letter-spacing:.06em;margin-bottom:12px;">WISSENSCHAFTLICH FUNDIERT</h3>
+        <p style="color:#555;font-size:.85rem;line-height:1.7;">Jede Formel basiert auf aktuellen Sportwissenschaften für maximale Effektivität und Sicherheit.</p>
+        <!-- Neon corner -->
+        <div style="position:absolute;bottom:14px;right:14px;width:14px;height:14px;border-bottom:1.5px solid rgba(255,26,60,.3);border-right:1.5px solid rgba(255,26,60,.3);"></div>
+      </div>
+      <!-- Feature 2 -->
+      <div style="background:var(--bg-2);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:32px;position:relative;overflow:hidden;transition:border-color .2s,transform .25s cubic-bezier(.34,1.56,.64,1);" onmouseover="this.style.borderColor='rgba(255,26,60,.25)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,.06)';this.style.transform=''">
+        <div style="width:44px;height:44px;background:rgba(255,26,60,.08);border:1px solid rgba(255,26,60,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:20px;">🤝</div>
+        <div class="neon-line" style="width:28px;margin-bottom:16px;height:1.5px;"></div>
+        <h3 style="font-family:var(--font-head);font-size:22px;letter-spacing:.06em;margin-bottom:12px;">COMMUNITY FIRST</h3>
+        <p style="color:#555;font-size:.85rem;line-height:1.7;">12.000+ Athleten, die gemeinsam wachsen. Teile deine Erfolge, push deine Grenzen in unserem Squad.</p>
+        <div style="position:absolute;bottom:14px;right:14px;width:14px;height:14px;border-bottom:1.5px solid rgba(255,26,60,.3);border-right:1.5px solid rgba(255,26,60,.3);"></div>
+      </div>
+      <!-- Feature 3 -->
+      <div style="background:var(--bg-2);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:32px;position:relative;overflow:hidden;transition:border-color .2s,transform .25s cubic-bezier(.34,1.56,.64,1);" onmouseover="this.style.borderColor='rgba(255,26,60,.25)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,.06)';this.style.transform=''">
+        <div style="width:44px;height:44px;background:rgba(255,26,60,.08);border:1px solid rgba(255,26,60,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:20px;">⚡</div>
+        <div class="neon-line" style="width:28px;margin-bottom:16px;height:1.5px;"></div>
+        <h3 style="font-family:var(--font-head);font-size:22px;letter-spacing:.06em;margin-bottom:12px;">EXPRESS LIEFERUNG</h3>
+        <p style="color:#555;font-size:.85rem;line-height:1.7;">Heute bestellen, morgen trainieren. Express-Versand durch ganz Deutschland und Europa mit Live-Tracking.</p>
+        <div style="position:absolute;bottom:14px;right:14px;width:14px;height:14px;border-bottom:1.5px solid rgba(255,26,60,.3);border-right:1.5px solid rgba(255,26,60,.3);"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CTA / JOIN
+════════════════════════════════════════════════════════════════════════ -->
+<section id="community" style="padding:120px 24px;text-align:center;position:relative;overflow:hidden;background:var(--bg-1);border-top:1px solid rgba(255,255,255,.04);">
+  <!-- Background glow -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%, rgba(255,26,60,.06) 0%, transparent 65%);pointer-events:none;"></div>
+  <!-- Grid intensified -->
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,26,60,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,26,60,.04) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;"></div>
+
+  <!-- Corner brackets -->
+  <div style="position:absolute;top:40px;left:40px;width:28px;height:28px;border-top:1.5px solid rgba(255,26,60,.4);border-left:1.5px solid rgba(255,26,60,.4);"></div>
+  <div style="position:absolute;top:40px;right:40px;width:28px;height:28px;border-top:1.5px solid rgba(255,26,60,.4);border-right:1.5px solid rgba(255,26,60,.4);"></div>
+  <div style="position:absolute;bottom:40px;left:40px;width:28px;height:28px;border-bottom:1.5px solid rgba(255,26,60,.4);border-left:1.5px solid rgba(255,26,60,.4);"></div>
+  <div style="position:absolute;bottom:40px;right:40px;width:28px;height:28px;border-bottom:1.5px solid rgba(255,26,60,.4);border-right:1.5px solid rgba(255,26,60,.4);"></div>
+
+  <div style="max-width:580px;margin:0 auto;position:relative;z-index:2;">
+    <img src="brand_assets/Willy's_Logo.png" alt="Willy's" style="height:88px;display:block;margin:0 auto 36px;filter:drop-shadow(0 0 18px rgba(255,26,60,.6)) drop-shadow(0 0 50px rgba(255,26,60,.25));">
+
+    <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.2em;color:var(--neon-red);margin-bottom:16px;">// START YOUR JOURNEY</div>
+
+    <h2 style="font-family:var(--font-head);font-size:clamp(48px,7vw,88px);line-height:.92;letter-spacing:-.01em;margin-bottom:24px;">
+      READY TO<br><span class="text-neon-red">LEVEL UP?</span>
+    </h2>
+
+    <p style="color:#555;font-size:1rem;line-height:1.75;margin-bottom:40px;">
+      Werde Teil der Willy's Community. Exklusive Drops, frühzeitiger Produktzugang und die besten Deals — direkt in dein Postfach.
+    </p>
+
+    <!-- Email signup -->
+    <div style="display:flex;gap:0;max-width:420px;margin:0 auto 20px;border:1px solid rgba(255,26,60,.3);border-radius:6px;overflow:hidden;background:rgba(0,0,0,.6);" onfocusin="this.style.borderColor='rgba(255,26,60,.7)';this.style.boxShadow='0 0 20px rgba(255,26,60,.15)'" onfocusout="this.style.borderColor='rgba(255,26,60,.3)';this.style.boxShadow=''">
+      <input type="email" placeholder="deine@email.com" style="flex:1;background:none;border:none;padding:14px 18px;color:var(--text);font-size:.88rem;outline:none;font-family:var(--font-body);">
+      <button class="btn-primary" style="padding:14px 24px;border-radius:0;font-size:.75rem;white-space:nowrap;">
+        Jetzt beitreten
+      </button>
+    </div>
+
+    <p style="font-family:var(--font-mono);font-size:.6rem;color:rgba(255,255,255,.2);letter-spacing:.08em;">KEIN SPAM · JEDERZEIT ABMELDBAR · 100% KOSTENLOS</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════════════════ -->
+<footer style="background:var(--bg);border-top:1px solid rgba(255,255,255,.05);padding:64px 24px 32px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="footer-grid" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:52px;">
+
+      <!-- Brand -->
+      <div class="footer-brand">
+        <img src="brand_assets/Willy's_Logo.png" alt="Willy's" style="height:44px;margin-bottom:18px;filter:drop-shadow(0 0 8px rgba(255,26,60,.4));">
+        <p style="color:#444;font-size:.85rem;line-height:1.75;max-width:270px;margin-bottom:24px;">Premium Sport Nutrition für die nächste Generation von Athleten. Powered by ESN & More Nutrition.</p>
+        <div style="display:flex;gap:10px;">
+          <a href="#" aria-label="Instagram" style="width:34px;height:34px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:15px;transition:background .15s,border-color .15s;" onmouseover="this.style.background='rgba(255,26,60,.1)';this.style.borderColor='rgba(255,26,60,.3)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.borderColor='rgba(255,255,255,.08)'">📸</a>
+          <a href="#" aria-label="TikTok"    style="width:34px;height:34px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:15px;transition:background .15s,border-color .15s;" onmouseover="this.style.background='rgba(255,26,60,.1)';this.style.borderColor='rgba(255,26,60,.3)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.borderColor='rgba(255,255,255,.08)'">🎵</a>
+          <a href="#" aria-label="YouTube"   style="width:34px;height:34px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:15px;transition:background .15s,border-color .15s;" onmouseover="this.style.background='rgba(255,26,60,.1)';this.style.borderColor='rgba(255,26,60,.3)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.borderColor='rgba(255,255,255,.08)'">▶️</a>
+        </div>
+      </div>
+
+      <!-- Shop -->
+      <div>
+        <h4 style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:18px;">Shop</h4>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:11px;">
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">Protein Shakes</a></li>
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">Mass Gainer</a></li>
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">Pre-Workout</a></li>
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">Bundles</a></li>
+        </ul>
+      </div>
+
+      <!-- Partner -->
+      <div>
+        <h4 style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:18px;">Partner</h4>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:11px;">
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">ESN</a></li>
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">More Nutrition</a></li>
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">Kooperation</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal -->
+      <div>
+        <h4 style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:18px;">Legal</h4>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:11px;">
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">Impressum</a></li>
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">Datenschutz</a></li>
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">AGB</a></li>
+          <li><a href="#" style="color:#444;text-decoration:none;font-size:.85rem;transition:color .15s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#444'">Widerruf</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div style="border-top:1px solid rgba(255,255,255,.05);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+      <span style="font-family:var(--font-mono);font-size:.62rem;color:rgba(255,255,255,.18);letter-spacing:.06em;">© 2025 WILLY'S. ALLE RECHTE VORBEHALTEN.</span>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-family:var(--font-mono);font-size:.58rem;color:rgba(255,255,255,.14);letter-spacing:.1em;">IN KOOPERATION MIT</span>
+        <span style="font-family:var(--font-head);font-size:15px;color:rgba(0,212,255,.35);letter-spacing:.1em;text-shadow:0 0 8px rgba(0,212,255,.2);">ESN</span>
+        <span style="color:rgba(255,255,255,.12);font-size:.8rem;">×</span>
+        <span style="font-family:var(--font-head);font-size:12px;color:rgba(57,255,110,.3);letter-spacing:.06em;text-shadow:0 0 8px rgba(57,255,110,.15);">MORE NUTRITION</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════════════════════════ -->
+<script>
+  // ── Mobile menu ──────────────────────────────────────────────────────
+  const hamburger   = document.getElementById('hamburger');
+  const mobileMenu  = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    const isOpen = mobileMenu.style.display === 'block';
+    mobileMenu.style.display = isOpen ? 'none' : 'block';
+  });
+  // Close on link click
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => { mobileMenu.style.display = 'none'; });
+  });
+
+  // ── Active nav highlight ──────────────────────────────────────────────
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks  = document.querySelectorAll('a.nav-link');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 80) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? '#f0f0f0' : '';
+    });
+  }, { passive: true });
+
+  // ── Reveal on scroll ─────────────────────────────────────────────────
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = e.target.style.transform.replace('translateY(24px)', 'translateY(0)');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.card').forEach(card => {
+    observer.observe(card);
+  });
+</script>
+</body>
+</html>
